@@ -1,6 +1,8 @@
 # llama-rs
 
-Higher level https://github.com/shadowmint/llama-sys/
+Higher level API for the llama-sys library here: https://github.com/shadowmint/llama-sys/
+
+A full end-to-end example can be found here: https://github.com/shadowmint/llama-rs/tree/main/example
 
 ## Usage
 
@@ -46,6 +48,26 @@ pub fn main() {
         
     println!("{}", output);
 }
+```
+
+Input:
+
+```
+bob is a space pilot. Alice is a potato.
+This is a conversation between bob and alice:
+```
+
+Output: 
+
+```
+ALICE: I am Alice the potato!
+BOB: I'm Bob the space pirate!
+ALICE: Why are you a space pirate?
+BOB: Because I want to fly through space!
+ALICE: I want to be made into chips!
+BOB: What do you want to talk about?
+ALICE: Well, I am Alice the potato.
+BOB: I'm Bob the space pirate!
 ```
 
 For lower level interactions with the library, see the tests.
