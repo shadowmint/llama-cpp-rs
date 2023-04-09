@@ -1,10 +1,8 @@
 use llama_sys::*;
 use std::ffi::{CStr, CString};
-use std::ptr;
-use std::ptr::{null, null_mut};
-use std::thread::sleep;
-use std::time::Duration;
 use std::io::Write;
+use std::ptr;
+use std::ptr::null_mut;
 
 #[test]
 pub fn main() {
@@ -22,18 +20,19 @@ pub fn main() {
 
         let model_path = CString::new("models/13B/model.bin").unwrap();
         let ctx = llama_init_from_file(model_path.as_ptr(), params);
-        assert!(ctx != null_mut());
+        assert_ne!(ctx, null_mut());
         println!("loaded model");
 
-        let prompt = " hello, my name is dave and I live in Oz. Where do I live?";
+        let prompt = "bob is a space pilot. Alice is a potato. This is a conversation between bob and alice:";
         let c_prompt = CString::new(prompt).unwrap();
         let c_prompt_bytes = c_prompt.as_bytes_with_nul();
         let c_prompt_ptr = &c_prompt_bytes[0] as *const u8 as *const i8;
 
         let mut embd_inp: Vec<llama_token> = vec![0; prompt.len() + 1];
-        let mut embd_inp_ptr: *mut i32 = &mut embd_inp[0] as *mut i32;
+        let embd_inp_ptr: *mut i32 = &mut embd_inp[0] as *mut i32;
         let embd_inp_len = embd_inp.len() as i32;
-        let prompt_token_count = llama_tokenize(ctx, c_prompt_ptr, embd_inp_ptr, embd_inp_len, true);
+        let prompt_token_count =
+            llama_tokenize(ctx, c_prompt_ptr, embd_inp_ptr, embd_inp_len, true);
         assert!(prompt_token_count > 0);
         embd_inp.truncate(prompt_token_count as usize);
         println!("prompt length: {}", prompt_token_count);
@@ -59,10 +58,14 @@ pub fn main() {
         let mut gen_buffer = vec![0; sample_size];
 
         // Initialize with prompt
-        let num_tokens_to_generate = 1;
-        let past_tokens = 0;
-        let eval_result = llama_eval(ctx, token_stream.as_ptr(), token_stream.len() as i32, 0, sample_worker_threads);
-        assert!(eval_result == 0);
+        let eval_result = llama_eval(
+            ctx,
+            token_stream.as_ptr(),
+            token_stream.len() as i32,
+            0,
+            sample_worker_threads,
+        );
+        assert_eq!(eval_result, 0);
 
         for _ in 0..num_predict {
             let top_k = 40;
@@ -74,7 +77,7 @@ pub fn main() {
             let gen_buffer_ptr = gen_buffer.as_mut_ptr();
             ptr::write_bytes(gen_buffer_ptr, 0, gen_buffer.len());
             if token_stream.len() < sample_size {
-                let mut end_partial = &mut gen_buffer[sample_size - token_stream.len()..];
+                let end_partial = &mut gen_buffer[sample_size - token_stream.len()..];
                 end_partial.copy_from_slice(&token_stream);
             } else {
                 gen_buffer.copy_from_slice(&token_stream[(token_stream.len() - sample_size)..])
@@ -84,11 +87,25 @@ pub fn main() {
             let last_real_token = &gen_buffer[gen_buffer.len() - 1] as *const i32;
             let num_tokens_to_generate = 1;
             let past_tokens = token_stream.len() as i32;
-            let eval_result = llama_eval(ctx, last_real_token, num_tokens_to_generate, past_tokens, sample_worker_threads);
-            assert!(eval_result == 0);
+            let eval_result = llama_eval(
+                ctx,
+                last_real_token,
+                num_tokens_to_generate,
+                past_tokens,
+                sample_worker_threads,
+            );
+            assert_eq!(eval_result, 0);
 
             // Sample result
-            let id = llama_sample_top_p_top_k(ctx, gen_buffer_ptr, sample_size as i32, top_k, top_p, temp, repeat_penalty);
+            let id = llama_sample_top_p_top_k(
+                ctx,
+                gen_buffer.as_mut_ptr(),
+                sample_size as i32,
+                top_k,
+                top_p,
+                temp,
+                repeat_penalty,
+            );
 
             if id == llama_token_eos() {
                 println!("Received end of stream");
