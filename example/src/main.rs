@@ -5,7 +5,7 @@ use std::io::Write;
 
 pub fn main() {
     // Setup params
-    let mut config = LContextConfig::new("models/13B/model.bin");
+    let mut config = LContextConfig::new("../models/13B/model.bin");
     config.n_ctx = 512;
     config.seed = 0;
 
@@ -39,5 +39,5 @@ pub fn main() {
         )
         .unwrap();
 
-    println!("\n\n: {}", output);
+    println!("\n\nfull output:\n{}", output);
 }
