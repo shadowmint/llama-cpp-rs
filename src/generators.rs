@@ -23,7 +23,27 @@ impl LGenerator {
         LGenerator { context }
     }
 
+    fn generate_no_op(_value: &str) {}
+
     pub fn generate(&mut self, prompt: &str, params: LGeneratorParams) -> Result<String, LError> {
+        self.generate_internal(prompt, params, LGenerator::generate_no_op)
+    }
+
+    pub fn generate_incremental(
+        &mut self,
+        prompt: &str,
+        params: LGeneratorParams,
+        callback: impl Fn(&str),
+    ) -> Result<String, LError> {
+        self.generate_internal(prompt, params, callback)
+    }
+
+    pub fn generate_internal(
+        &mut self,
+        prompt: &str,
+        params: LGeneratorParams,
+        callback: impl Fn(&str),
+    ) -> Result<String, LError> {
         // Load prompt
         let prompt_tokens = self.context.tokenize(prompt)?;
         let mut token_stream = prompt_tokens;
@@ -36,6 +56,7 @@ impl LGenerator {
         self.context
             .load_prompt(&token_stream, params.worker_thread_count)?;
 
+        let mut token_strings = Vec::new();
         for _ in 0..params.generate_tokens {
             gen_buffer.clear();
             gen_buffer.copy_trailing(&token_stream);
@@ -57,17 +78,18 @@ impl LGenerator {
                 break;
             }
 
+            // Incremental completion callback
+            if token.has_str_value() {
+                let token_string = token.as_string(&self.context)?;
+                callback(&token_string);
+                token_strings.push(token_string);
+            }
+
             // Save token
             token_stream.push(token);
         }
 
         // Convert token stream back into a string
-        let mut token_strings = Vec::new();
-        for token in token_stream.iter() {
-            if token.has_str_value() {
-                token_strings.push(token.as_string(&self.context)?);
-            }
-        }
         Ok(token_strings.join(""))
     }
 }
