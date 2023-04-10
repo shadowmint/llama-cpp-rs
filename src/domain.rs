@@ -1,4 +1,6 @@
 use llama_cpp_sys;
+use llama_cpp_sys::llama_token_data;
+use std::ffi::c_char;
 use std::path::PathBuf;
 
 mod llama_context;
@@ -14,7 +16,7 @@ pub use self::llama_error::LError;
 pub struct LContextConfig {
     model_path: PathBuf,
     params: llama_cpp_sys::llama_context_params,
-    pub seed: i32,
+    pub seed: u32,
     pub n_ctx: i32,
     pub n_parts: i32,
     pub f16_kv: bool,
@@ -22,6 +24,8 @@ pub struct LContextConfig {
     pub vocab_only: bool,
     pub logits_all: bool,
     pub embedding: bool,
+    pub n_gpu_layers: i32,
+    pub low_vram: bool,
 }
 
 /// Parameters for sampling the context
@@ -31,12 +35,21 @@ pub struct LSampleParams {
     pub top_p: f32,
     pub temp: f32,
     pub repeat_penalty: f32,
+    pub repeat_history_length: usize,
+    pub tfs_z: f32,
+    pub typical_p: f32,
 }
 
 /// A context contains the loaded model
 pub struct LContext {
     steps: usize,
+    model: *mut llama_cpp_sys::llama_model,
     ctx: *mut llama_cpp_sys::llama_context,
+
+    // TODO: Split this into a new file
+    candidates: Vec<llama_token_data>,
+    token_history: Vec<llama_cpp_sys::llama_token>,
+    token_buffer: Vec<c_char>,
 }
 
 /// A text sequence is represented as a sequence of tokens for inference.
@@ -52,4 +65,5 @@ pub enum LToken {
 #[derive(Clone)]
 pub struct LTokenSequence {
     tokens: Vec<llama_cpp_sys::llama_token>,
+    end_of_stream: llama_cpp_sys::llama_token,
 }

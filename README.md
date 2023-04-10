@@ -81,9 +81,8 @@ Put your models in the `models` folder; the test expects a file in the path:
 You can then generate using
     
     cargo test --release --test "test_api" -- --nocapture
-
-Or:
-
     cargo test --release --test "test_generator" -- --nocapture
+    cargo test --release --test "test_generator_incremental" -- --nocapture
+    cargo test --release --test "test_generator_incremental_instruct" -- --nocapture
 
 Running outside of release mode will be significantly slower.

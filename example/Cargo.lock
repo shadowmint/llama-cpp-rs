@@ -81,7 +81,7 @@ checksum = "7fcaabb2fef8c910e7f4c7ce9f67a1283a1715879a7c230ca9d6d1ae31f16d91"
 name = "example"
 version = "0.1.0"
 dependencies = [
- "llama-rs",
+ "llama-cpp-rs",
 ]
 
 [[package]]
@@ -119,17 +119,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "llama-rs"
-version = "0.1.0"
-source = "git+https://github.com/shadowmint/llama-rs.git?tag=0.1.0#97a5ba837b31ce47030b732bf163e32028f5c6f6"
+name = "llama-cpp-rs"
+version = "0.1.1"
+source = "git+https://github.com/shadowmint/llama-cpp-rs.git?tag=0.1.1#ccda11956d6f088b89991eec1021a0d7f770eb67"
 dependencies = [
- "llama-sys",
+ "llama-cpp-sys",
 ]
 
 [[package]]
-name = "llama-sys"
-version = "1.0.0"
-source = "git+https://github.com/shadowmint/llama-sys.git?tag=1.0.0#33457032a09e50ede38faccb09199758f0349609"
+name = "llama-cpp-sys"
+version = "1.0.1"
+source = "git+https://github.com/shadowmint/llama-cpp-sys.git?tag=1.0.1#5caff42591d8fa6a296ad4fff804267b6a38bd60"
 dependencies = [
  "bindgen",
  "cmake",

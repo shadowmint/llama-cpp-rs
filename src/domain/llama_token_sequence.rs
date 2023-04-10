@@ -1,17 +1,14 @@
 use crate::domain::LTokenSequence;
-use crate::LToken;
+use crate::{LContext, LToken};
 use std::fmt::{Debug, Formatter};
 use std::ptr;
 
-impl Default for LTokenSequence {
-    fn default() -> Self {
-        LTokenSequence::new()
-    }
-}
-
 impl LTokenSequence {
-    pub fn new() -> LTokenSequence {
-        LTokenSequence { tokens: Vec::new() }
+    pub fn new(ctx: &LContext) -> LTokenSequence {
+        LTokenSequence {
+            tokens: Vec::new(),
+            end_of_stream: unsafe { llama_cpp_sys::llama_token_eos(ctx.native_ptr()) },
+        }
     }
 
     /// Increase the manifest allocation of tokens in this sequence to length.
@@ -35,9 +32,8 @@ impl LTokenSequence {
     }
 
     pub fn iter(&self) -> Box<dyn Iterator<Item = LToken> + '_> {
-        let end_of_stream = unsafe { llama_cpp_sys::llama_token_eos() };
         Box::new(self.tokens.iter().map(move |t| {
-            if *t == end_of_stream {
+            if *t == self.end_of_stream {
                 LToken::EndOfStream
             } else {
                 LToken::Token(*t)
@@ -45,8 +41,8 @@ impl LTokenSequence {
         }))
     }
 
-    pub fn push(&mut self, token: LToken) {
-        let value = unsafe { token.native_value() };
+    pub fn push(&mut self, token: LToken, context: &LContext) {
+        let value = unsafe { token.native_value(context) };
         self.tokens.push(value);
     }
 
@@ -74,8 +70,7 @@ impl LTokenSequence {
             }
         } else {
             let from_ptr = unsafe { from.native_ptr_slice() };
-            self.tokens
-                .copy_from_slice(&from_ptr[(from_len - self_len)..])
+            self.tokens.copy_from_slice(&from_ptr[(from_len - self_len)..])
         }
     }
 
@@ -85,13 +80,6 @@ impl LTokenSequence {
 
     pub(crate) unsafe fn native_mut_ptr(&mut self) -> *mut llama_cpp_sys::llama_token {
         self.tokens.as_mut_ptr()
-    }
-
-    pub(crate) unsafe fn native_ptr_offset(
-        &self,
-        offset: usize,
-    ) -> *const llama_cpp_sys::llama_token {
-        self.tokens.as_ptr().add(offset)
     }
 
     pub(crate) unsafe fn native_ptr_slice(&self) -> &[llama_cpp_sys::llama_token] {

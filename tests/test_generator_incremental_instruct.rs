@@ -7,7 +7,7 @@ use std::io::Write;
 pub fn main() {
     // Setup params
     env::set_var("LLAMA_METAL_KERNEL", "models/ggml-metal.metal");
-    let mut config = LContextConfig::new("models/codellama-13b-instruct.Q5_K_M.gguf");
+    let mut config = LContextConfig::new("models/phind-codellama-34b-v2.Q5_K_M.gguf");
     config.n_ctx = 1024;
     config.seed = 2133;
     config.n_gpu_layers = 32;
@@ -16,7 +16,14 @@ pub fn main() {
     let mut context = LContext::new(config).unwrap();
 
     // Run the generator
-    let prompt = "<s>[INST]Replace IMPLEMENT_ME with a real implementation in javascript ```/** Prints o number of times equal to n */\nfunction print_o(int n) { IMPLEMENT_ME };```[/INST]";
+    let prompt = "### System Prompt
+You are an intelligent programming assistant.
+
+### User Message
+Implement a linked list in rust.
+
+### Assistant
+...";
     println!("{}", prompt);
 
     let expected_pattern = Regex::new("(?s).*```.*```.*").unwrap();

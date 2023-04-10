@@ -6,4 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-llama-cpp-sys = { git = "https://github.com/shadowmint/llama-cpp-sys.git", tag = "1.0.1" }
+llama-cpp-sys = { path = "../llama-cpp-sys" }
+
+[dev-dependencies]
+regex = "1.9.3"

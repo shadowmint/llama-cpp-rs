@@ -16,6 +16,8 @@ impl LContextConfig {
                 vocab_only: false,
                 logits_all: false,
                 embedding: false,
+                n_gpu_layers: 0,
+                low_vram: false,
             }
         }
     }
@@ -23,13 +25,14 @@ impl LContextConfig {
     pub(crate) unsafe fn native_ptr(&mut self) -> llama_context_params {
         self.params.seed = self.seed;
         self.params.n_ctx = self.n_ctx;
-        self.params.n_parts = self.n_parts;
         self.params.f16_kv = self.f16_kv;
         self.params.use_mlock = self.use_mlock;
         self.params.vocab_only = self.vocab_only;
         self.params.logits_all = self.logits_all;
         self.params.embedding = self.embedding;
         self.params.progress_callback = None;
+        self.params.n_gpu_layers = self.n_gpu_layers;
+        self.params.low_vram = self.low_vram;
         self.params
     }
 }

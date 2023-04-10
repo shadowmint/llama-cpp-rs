@@ -14,6 +14,9 @@ pub enum LError {
     /// Refuse to sample and raise this error if someone tries to sample before the model
     /// is ready.
     CannotSampleBeforeInference,
+
+    /// If you try to do something that will not fix in the buffer you've allocated.
+    OutOfBufferSpace(String),
 }
 
 impl Error for LError {}
