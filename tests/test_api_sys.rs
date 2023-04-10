@@ -1,4 +1,4 @@
-use llama_sys::*;
+use llama_cpp_sys::*;
 use std::ffi::{CStr, CString};
 use std::io::Write;
 use std::ptr;

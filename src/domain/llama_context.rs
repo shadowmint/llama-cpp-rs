@@ -1,6 +1,6 @@
 use crate::domain::LTokenSequence;
 use crate::{LContext, LContextConfig, LError, LSampleParams, LToken};
-use llama_sys::{llama_context, llama_init_from_file, llama_tokenize};
+use llama_cpp_sys::{llama_context, llama_init_from_file, llama_tokenize};
 use std::ffi::CString;
 
 impl LContext {
@@ -75,7 +75,7 @@ impl LContext {
             let ctx = self.native_ptr();
             let token_ptr = seq.native_ptr_offset(offset);
             //println!("root token: {}, count: {}", (*token_ptr), num_generate);
-            llama_sys::llama_eval(
+            llama_cpp_sys::llama_eval(
                 ctx,
                 token_ptr,
                 num_generate as i32,
@@ -105,7 +105,7 @@ impl LContext {
         //println!("{:?}, {:?}", active_params, seq);
         let id = unsafe {
             let ctx = self.native_ptr();
-            llama_sys::llama_sample_top_p_top_k(
+            llama_cpp_sys::llama_sample_top_p_top_k(
                 ctx,
                 seq.native_ptr(),
                 seq.len() as i32,

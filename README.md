@@ -1,8 +1,8 @@
-# llama-rs
+# llama-cpp-rs
 
-Higher level API for the llama-sys library here: https://github.com/shadowmint/llama-sys/
+Higher level API for the llama-cpp-sys library here: https://github.com/shadowmint/llama-cpp-sys/
 
-A full end-to-end example can be found here: https://github.com/shadowmint/llama-rs/tree/main/example
+A full end-to-end example can be found here: https://github.com/shadowmint/llama-coo-rs/tree/main/example
 
 ## Usage
 
@@ -11,7 +11,7 @@ See the `tests` folder, or the `example` folder for an end-to-end example.
 Basic usage is:
 
 ```
-use llama_rs::{
+use llama_cpp_rs::{
     LContext, LContextConfig, LGenerator, LGeneratorParams, LSampleParams, LToken, LTokenSequence,
 };
 

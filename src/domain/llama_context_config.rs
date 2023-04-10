@@ -1,5 +1,5 @@
 use crate::LContextConfig;
-use llama_sys::{llama_context_default_params, llama_context_params};
+use llama_cpp_sys::{llama_context_default_params, llama_context_params};
 use std::path::{Path, PathBuf};
 
 impl LContextConfig {

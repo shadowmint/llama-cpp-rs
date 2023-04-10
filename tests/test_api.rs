@@ -1,4 +1,4 @@
-use llama_rs::{LContext, LContextConfig, LToken, LTokenSequence};
+use llama_cpp_rs::{LContext, LContextConfig, LToken, LTokenSequence};
 use std::io::Write;
 
 #[test]

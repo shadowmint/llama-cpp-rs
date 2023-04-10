@@ -35,7 +35,7 @@ impl LTokenSequence {
     }
 
     pub fn iter(&self) -> Box<dyn Iterator<Item = LToken> + '_> {
-        let end_of_stream = unsafe { llama_sys::llama_token_eos() };
+        let end_of_stream = unsafe { llama_cpp_sys::llama_token_eos() };
         Box::new(self.tokens.iter().map(move |t| {
             if *t == end_of_stream {
                 LToken::EndOfStream
@@ -79,19 +79,22 @@ impl LTokenSequence {
         }
     }
 
-    pub(crate) unsafe fn native_ptr(&self) -> *const llama_sys::llama_token {
+    pub(crate) unsafe fn native_ptr(&self) -> *const llama_cpp_sys::llama_token {
         self.tokens.as_ptr()
     }
 
-    pub(crate) unsafe fn native_mut_ptr(&mut self) -> *mut llama_sys::llama_token {
+    pub(crate) unsafe fn native_mut_ptr(&mut self) -> *mut llama_cpp_sys::llama_token {
         self.tokens.as_mut_ptr()
     }
 
-    pub(crate) unsafe fn native_ptr_offset(&self, offset: usize) -> *const llama_sys::llama_token {
+    pub(crate) unsafe fn native_ptr_offset(
+        &self,
+        offset: usize,
+    ) -> *const llama_cpp_sys::llama_token {
         self.tokens.as_ptr().add(offset)
     }
 
-    pub(crate) unsafe fn native_ptr_slice(&self) -> &[llama_sys::llama_token] {
+    pub(crate) unsafe fn native_ptr_slice(&self) -> &[llama_cpp_sys::llama_token] {
         self.tokens.as_ref()
     }
 }

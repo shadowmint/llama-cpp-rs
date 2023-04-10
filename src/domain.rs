@@ -1,4 +1,4 @@
-use llama_sys;
+use llama_cpp_sys;
 use std::path::PathBuf;
 
 mod llama_context;
@@ -13,7 +13,7 @@ pub use self::llama_error::LError;
 /// You construct a context using these parameters
 pub struct LContextConfig {
     model_path: PathBuf,
-    params: llama_sys::llama_context_params,
+    params: llama_cpp_sys::llama_context_params,
     pub seed: i32,
     pub n_ctx: i32,
     pub n_parts: i32,
@@ -36,7 +36,7 @@ pub struct LSampleParams {
 /// A context contains the loaded model
 pub struct LContext {
     steps: usize,
-    ctx: *mut llama_sys::llama_context,
+    ctx: *mut llama_cpp_sys::llama_context,
 }
 
 /// A text sequence is represented as a sequence of tokens for inference.
@@ -45,11 +45,11 @@ pub struct LContext {
 pub enum LToken {
     BeginningOfStream,
     EndOfStream,
-    Token(llama_sys::llama_token),
+    Token(llama_cpp_sys::llama_token),
 }
 
 /// A set of tokens representing a block of text.
 #[derive(Clone)]
 pub struct LTokenSequence {
-    tokens: Vec<llama_sys::llama_token>,
+    tokens: Vec<llama_cpp_sys::llama_token>,
 }

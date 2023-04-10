@@ -1,6 +1,4 @@
-use llama_rs::{
-    LContext, LContextConfig, LGenerator, LGeneratorParams, LSampleParams, LToken, LTokenSequence,
-};
+use llama_cpp_rs::{LContext, LContextConfig, LGenerator, LGeneratorParams, LSampleParams};
 
 #[test]
 pub fn main() {
@@ -10,7 +8,7 @@ pub fn main() {
     config.seed = 0;
 
     // Load model
-    let mut context = LContext::new(config).unwrap();
+    let context = LContext::new(config).unwrap();
 
     // Run the generator
     let prompt =

@@ -1,4 +1,4 @@
-use llama_rs::{
+use llama_cpp_rs::{
     LContext, LContextConfig, LGenerator, LGeneratorParams, LSampleParams, LToken, LTokenSequence,
 };
 use std::io::Write;
