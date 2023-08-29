@@ -1,7 +1,0 @@
-[package]
-name = "example"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-llama-cpp-rs = { git = "https://github.com/shadowmint/llama-cpp-rs.git", tag = "0.1.1" }
