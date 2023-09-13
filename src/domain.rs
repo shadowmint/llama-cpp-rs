@@ -55,15 +55,10 @@ pub struct LContext {
 /// A text sequence is represented as a sequence of tokens for inference.
 /// A `Context` can convert a token into the associated text sequence.
 #[derive(Clone)]
-pub enum LToken {
-    BeginningOfStream,
-    EndOfStream,
-    Token(llama_cpp_sys::llama_token),
-}
+pub struct LToken(llama_cpp_sys::llama_token);
 
 /// A set of tokens representing a block of text.
 #[derive(Clone)]
 pub struct LTokenSequence {
     tokens: Vec<llama_cpp_sys::llama_token>,
-    end_of_stream: llama_cpp_sys::llama_token,
 }

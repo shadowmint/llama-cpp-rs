@@ -1,19 +1,17 @@
-use llama_cpp_rs::{LContext, LContextConfig, LGenerator, LGeneratorParams, LSampleParams, LToken, LTokenSequence};
+use llama_cpp_rs::{LContext, LContextConfig, LGenerator, LGeneratorParams, LSampleParams};
 use regex::Regex;
-use std::env;
 use std::io::Write;
 
 #[test]
 pub fn main() {
     // Setup params
-    env::set_var("LLAMA_METAL_KERNEL", "models/ggml-metal.metal");
-    let mut config = LContextConfig::new("models/phind-codellama-34b-v2.Q5_K_M.gguf");
+    let mut config = LContextConfig::new("models/model.gguf");
     config.n_ctx = 1024;
     config.seed = 2133;
     config.n_gpu_layers = 32;
 
     // Load model
-    let mut context = LContext::new(config).unwrap();
+    let context = LContext::new(config).unwrap();
 
     // Run the generator
     let prompt = "### System Prompt

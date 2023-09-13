@@ -3,8 +3,7 @@ use crate::{LContext, LContextConfig, LError, LSampleParams, LToken};
 use llama_cpp_sys::{
     llama_backend_free, llama_context, llama_free, llama_free_model, llama_get_kv_cache_token_count, llama_get_logits, llama_load_model_from_file,
     llama_n_ctx, llama_n_vocab, llama_new_context_with_model, llama_sample_repetition_penalty, llama_sample_tail_free, llama_sample_temperature,
-    llama_sample_token, llama_sample_top_k, llama_sample_top_p, llama_sample_typical, llama_token_data,
-    llama_token_data_array, llama_tokenize,
+    llama_sample_token, llama_sample_top_k, llama_sample_top_p, llama_sample_typical, llama_token_data, llama_token_data_array, llama_tokenize,
 };
 use std::ffi::CString;
 
@@ -30,7 +29,7 @@ impl LContext {
 
     /// Convert a string into a token sequence object.
     pub fn tokenize(&self, value: &str) -> Result<LTokenSequence, LError> {
-        let mut tokens = LTokenSequence::new(self);
+        let mut tokens = LTokenSequence::new();
 
         // We need to allocate enough space for the entire value to fit into the token space.
         // Since a token can be 1..n in length, we allocate the maximum possible length and
@@ -98,7 +97,6 @@ impl LContext {
             return Err(LError::CannotSampleBeforeInference);
         }
         let active_params = params.unwrap_or(Default::default());
-        //println!("{:?}, {:?}", active_params, seq);
         let id = unsafe {
             let logits = llama_get_logits(self.ctx);
             let n_vocab = llama_n_vocab(self.ctx);
@@ -138,7 +136,7 @@ impl LContext {
         };
 
         self.update_token_history(id, active_params);
-        Ok(LToken::Token(id))
+        Ok(LToken::from(id))
     }
 
     fn update_token_history(&mut self, id: llama_cpp_sys::llama_token, params: LSampleParams) {

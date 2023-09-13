@@ -1,6 +1,6 @@
-use llama_cpp_rs::{LContext, LContextConfig, LSampleParams, LToken, LTokenSequence};
-use std::env;
+use llama_cpp_rs::{LContext, LContextConfig, LSampleParams, LTokenSequence};
 use std::io::Write;
+
 #[test]
 pub fn main() {
     let num_predict = 512;
@@ -8,8 +8,7 @@ pub fn main() {
     let context_length: usize = 1024;
 
     // Setup params
-    env::set_var("LLAMA_METAL_KERNEL", "models/ggml-metal.metal");
-    let mut config = LContextConfig::new("models/codellama-13b-instruct.Q5_K_M.gguf");
+    let mut config = LContextConfig::new("models/model.gguf");
     config.n_ctx = context_length as i32;
     config.n_gpu_layers = 32;
     config.seed = 0;
@@ -27,7 +26,7 @@ pub fn main() {
     // Print prompt
     println!("prompt:");
     for token in token_stream.iter() {
-        if token.has_str_value() {
+        if token.has_str_value(&context) {
             let token_str = token.as_string(&mut context).unwrap();
             print!("{}", token_str);
         }
@@ -35,7 +34,7 @@ pub fn main() {
 
     // The query buffer is a window into the token stream to use for inference
     println!("\n\ngenerating...\n");
-    let mut gen_buffer = LTokenSequence::new(&context);
+    let mut gen_buffer = LTokenSequence::new();
     gen_buffer.resize(1); // Add one token at a time during the generate phase
 
     // Initialize with prompt
@@ -60,13 +59,13 @@ pub fn main() {
             }))
             .unwrap();
 
-        if let LToken::EndOfStream = token {
+        if token.is_end_of_stream(&context) {
             println!("Received end of stream");
             break;
         }
 
         // Save token
-        token_stream.push(token.clone(), &context);
+        token_stream.push(token.clone());
 
         // Print incremental output to stdout
         if let Ok(token_str) = token.as_string(&mut context) {

@@ -1,11 +1,9 @@
 use llama_cpp_rs::{LContext, LContextConfig, LGenerator, LGeneratorParams, LSampleParams};
-use std::env;
 
 #[test]
 pub fn main() {
     // Setup params
-    env::set_var("LLAMA_METAL_KERNEL", "models/ggml-metal.metal");
-    let mut config = LContextConfig::new("models/codellama-13b-instruct.Q5_K_M.gguf");
+    let mut config = LContextConfig::new("models/model.gguf");
     config.n_ctx = 512;
     config.seed = 1;
     config.n_gpu_layers = 32;

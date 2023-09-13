@@ -1,15 +1,21 @@
 use crate::{LContext, LError, LToken};
-use llama_cpp_sys::llama_token_to_piece;
+use llama_cpp_sys::{llama_token, llama_token_to_piece};
 use std::ffi::CStr;
+
+impl From<llama_token> for LToken {
+    fn from(value: llama_token) -> Self {
+        LToken { 0: value }
+    }
+}
 
 impl LToken {
     pub fn as_string(&self, context: &mut LContext) -> Result<String, LError> {
-        if !self.has_str_value() {
+        if !self.has_str_value(context) {
             return Err(LError::TokenizationError("No string repr available for token".to_string()));
         }
         let str_value = unsafe {
             let ctx = context.native_ptr();
-            let token = self.native_value(&context);
+            let token = self.native_value();
 
             context.token_buffer.fill(0);
             let piece_length = llama_token_to_piece(ctx, token, context.token_buffer.as_mut_ptr(), context.token_buffer.len() as i32);
@@ -42,19 +48,19 @@ impl LToken {
         0
     }
 
-    pub fn has_str_value(&self) -> bool {
-        match self {
-            LToken::BeginningOfStream => false,
-            LToken::EndOfStream => false,
-            LToken::Token(_) => true,
-        }
+    pub fn has_str_value(&self, context: &LContext) -> bool {
+        !self.is_end_of_stream(context) && !self.is_beginning_of_stream(context)
     }
 
-    pub(crate) unsafe fn native_value(&self, context: &LContext) -> llama_cpp_sys::llama_token {
-        match self {
-            LToken::BeginningOfStream => unsafe { llama_cpp_sys::llama_token_bos(context.native_ptr()) },
-            LToken::EndOfStream => unsafe { llama_cpp_sys::llama_token_eos(context.native_ptr()) },
-            LToken::Token(t) => *t,
-        }
+    pub fn is_end_of_stream(&self, context: &LContext) -> bool {
+        self.0 == unsafe { llama_cpp_sys::llama_token_eos(context.native_ptr()) }
+    }
+
+    pub fn is_beginning_of_stream(&self, context: &LContext) -> bool {
+        self.0 == unsafe { llama_cpp_sys::llama_token_bos(context.native_ptr()) }
+    }
+
+    pub(crate) unsafe fn native_value(&self) -> llama_cpp_sys::llama_token {
+        self.0
     }
 }

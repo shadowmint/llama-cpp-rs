@@ -1,14 +1,11 @@
 use crate::domain::LTokenSequence;
-use crate::{LContext, LToken};
+use crate::LToken;
 use std::fmt::{Debug, Formatter};
 use std::ptr;
 
 impl LTokenSequence {
-    pub fn new(ctx: &LContext) -> LTokenSequence {
-        LTokenSequence {
-            tokens: Vec::new(),
-            end_of_stream: unsafe { llama_cpp_sys::llama_token_eos(ctx.native_ptr()) },
-        }
+    pub fn new() -> LTokenSequence {
+        LTokenSequence { tokens: Vec::new() }
     }
 
     /// Increase the manifest allocation of tokens in this sequence to length.
@@ -32,17 +29,11 @@ impl LTokenSequence {
     }
 
     pub fn iter(&self) -> Box<dyn Iterator<Item = LToken> + '_> {
-        Box::new(self.tokens.iter().map(move |t| {
-            if *t == self.end_of_stream {
-                LToken::EndOfStream
-            } else {
-                LToken::Token(*t)
-            }
-        }))
+        Box::new(self.tokens.iter().map(move |t| LToken::from(*t)))
     }
 
-    pub fn push(&mut self, token: LToken, context: &LContext) {
-        let value = unsafe { token.native_value(context) };
+    pub fn push(&mut self, token: LToken) {
+        let value = unsafe { token.native_value() };
         self.tokens.push(value);
     }
 

@@ -1,4 +1,4 @@
-use crate::{LContext, LError, LSampleParams, LToken, LTokenSequence};
+use crate::{LContext, LError, LSampleParams, LTokenSequence};
 
 pub struct LGeneratorParams {
     /// Generate this number of tokens before halting
@@ -38,14 +38,14 @@ impl LGenerator {
         let mut token_stream = prompt_tokens;
 
         // The query buffer is a window into the token stream to use for inference
-        let mut gen_buffer = LTokenSequence::new(&self.context);
+        let mut gen_buffer = LTokenSequence::new();
         gen_buffer.resize(1); // Always generate a single new token per round
 
         // Initialize with prompt
         self.context.load_prompt(&token_stream, params.worker_thread_count)?;
 
         let mut token_strings = Vec::new();
-        for _ in 0..params.generate_tokens {
+        for _ in 0..(params.generate_tokens - 1) {
             gen_buffer.clear();
             gen_buffer.copy_trailing(&token_stream);
 
@@ -54,15 +54,15 @@ impl LGenerator {
 
             // Sample result
             let token = self.context.sample(Some(params.sample_params))?;
-            if let LToken::EndOfStream = token {
+            if token.is_end_of_stream(&self.context) {
                 break;
             }
 
             // Save token
-            token_stream.push(token.clone(), &self.context);
+            token_stream.push(token.clone());
 
             // Incremental completion callback
-            if token.has_str_value() {
+            if token.has_str_value(&self.context) {
                 let token_string = token.as_string(&mut self.context)?;
                 token_strings.push(token_string);
 

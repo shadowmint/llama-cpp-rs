@@ -1,12 +1,12 @@
 [package]
 name = "llama-cpp-rs"
-version = "0.2.0"
+version = "0.4.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-llama-cpp-sys = { git = "https://github.com/shadowmint/llama-cpp-sys.git", tag = "2.0.0" }
+llama-cpp-sys = { git = "https://github.com/shadowmint/llama-cpp-sys.git", tag = "0.4.0" }
 
 [dev-dependencies]
 regex = "1.9.3"
